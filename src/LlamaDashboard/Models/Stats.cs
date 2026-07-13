@@ -12,4 +12,7 @@ public class Stats
     public DateTime LastRequest { get; set; }
     public int CacheHits { get; set; }
     public int CacheMisses { get; set; }
+    public long PromptTokens { get; set; }
+    public long CompletionTokens { get; set; }
+    public long KvCacheSize { get; set; }
 }

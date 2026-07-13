@@ -43,7 +43,7 @@ public class ConfigService
         {
             ServerUrl = _configuration.GetValue<string>("LlamaCpp:Url") ?? "http://localhost:8080/v1",
             ApiKey = _configuration.GetValue<string>("LlamaCpp:ApiKey") ?? string.Empty,
-            RefreshInterval = _configuration.GetValue<int>("LlamaCpp:RefreshInterval") ?? 5000,
+            RefreshInterval = _configuration.GetValue<int>("LlamaCpp:RefreshInterval", 5000),
             DashboardName = _configuration.GetValue<string>("Dashboard:Name") ?? "Llama Dashboard",
             Theme = _configuration.GetValue<string>("Dashboard:Theme") ?? "dark"
         };

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LlamaDashboard")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb88fcb551ede3d363ce727687713e0d3879d87c")]
 [assembly: System.Reflection.AssemblyProductAttribute("LlamaDashboard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LlamaDashboard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

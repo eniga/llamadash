@@ -83,7 +83,8 @@
             StateHasChanged();
         };
         
-        refreshTimer = new Timer(RefreshData, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(ConfigService.GetCurrentConfig().RefreshInterval));
+        var interval = ConfigService.GetCurrentConfig().RefreshInterval;
+        refreshTimer = new Timer(_ => _ = RefreshData(), null, 0, interval);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -102,7 +103,7 @@
             var models = await LlamaService.GetModelsAsync();
             var health = await LlamaService.HealthCheckAsync();
 
-            currentStats = stats;
+            currentStats = stats ?? new Models.Stats();
             currentModel = models.FirstOrDefault(m => m.IsLoaded)?.Name ?? "None";
             isConnected = health;
 

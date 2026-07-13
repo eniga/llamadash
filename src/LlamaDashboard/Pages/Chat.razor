@@ -75,8 +75,7 @@
                 var assistantMsg = new ChatMessage 
                 { 
                     Role = "assistant", 
-                    Content = response.Choices[0].Message.Content,
-                    IsUser = false 
+                    Content = response.Choices[0].Message.Content
                 };
                 messages.Add(assistantMsg);
             }
@@ -86,8 +85,7 @@
             var errorMsg = new ChatMessage 
             { 
                 Role = "assistant", 
-                Content = $"Error: {ex.Message}",
-                IsUser = false 
+                Content = $"Error: {ex.Message}"
             };
             messages.Add(errorMsg);
         }

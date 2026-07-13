@@ -164,9 +164,9 @@ public class LlamaCppService : ILlamaCppService
                     Id = 0,
                     Name = "GPU 0",
                     Type = "NVIDIA",
-                    TotalMemory = 24 * 1024 * 1024 * 1024,
-                    UsedMemory = 12 * 1024 * 1024 * 1024,
-                    FreeMemory = 12 * 1024 * 1024 * 1024,
+                    TotalMemory = 24L * 1024 * 1024 * 1024,
+                    UsedMemory = 12L * 1024 * 1024 * 1024,
+                    FreeMemory = 12L * 1024 * 1024 * 1024,
                     Utilization = 50,
                     CudaVersion = "12.1"
                 }

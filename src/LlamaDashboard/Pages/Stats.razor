@@ -96,7 +96,7 @@
 
     private async Task RefreshStats()
     {
-        stats = await LlamaService.GetStatsAsync();
+        stats = await LlamaService.GetStatsAsync() ?? new Models.Stats();
     }
 
     private string FormatUptime(double seconds)
