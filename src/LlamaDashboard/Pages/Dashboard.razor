@@ -70,7 +70,7 @@
 </div>
 
 @code {
-    private Stats currentStats = new Stats();
+    private LlamaDashboard.Models.Stats currentStats = new LlamaDashboard.Models.Stats();
     private string currentModel = "None";
     private bool isConnected = false;
     private List<ActivityItem> recentActivities = new();
@@ -103,7 +103,7 @@
             var models = await LlamaService.GetModelsAsync();
             var health = await LlamaService.HealthCheckAsync();
 
-            currentStats = stats ?? new Models.Stats();
+            currentStats = stats;
             currentModel = models.FirstOrDefault(m => m.IsLoaded)?.Name ?? "None";
             isConnected = health;
 

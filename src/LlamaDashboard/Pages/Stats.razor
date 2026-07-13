@@ -87,7 +87,7 @@
 </div>
 
 @code {
-    private Stats? stats;
+    private LlamaDashboard.Models.Stats? stats;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,7 +96,7 @@
 
     private async Task RefreshStats()
     {
-        stats = await LlamaService.GetStatsAsync() ?? new Models.Stats();
+        stats = await LlamaService.GetStatsAsync();
     }
 
     private string FormatUptime(double seconds)

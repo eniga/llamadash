@@ -63,7 +63,7 @@
             var request = new ChatCompletionRequest
             {
                 Model = "default",
-                Messages = messages.Select(m => new Message { Role = m.Role, Content = m.Content }).ToList(),
+                Messages = messages,
                 Temperature = 0.7,
                 MaxTokens = 2048
             };
