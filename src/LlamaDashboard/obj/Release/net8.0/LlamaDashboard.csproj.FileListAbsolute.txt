@@ -1,0 +1,9 @@
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/rpswa.dswa.cache.json
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/LlamaDashboard.GeneratedMSBuildEditorConfig.editorconfig
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/LlamaDashboard.AssemblyInfoInputs.cache
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/LlamaDashboard.AssemblyInfo.cs
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/LlamaDashboard.csproj.CoreCompileInputs.cache
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/LlamaDashboard.MvcApplicationPartsAssemblyInfo.cache
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/LlamaDashboard.RazorAssemblyInfo.cache
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/LlamaDashboard.RazorAssemblyInfo.cs
+/Users/enigaahiante/Projects/llamadash/src/LlamaDashboard/obj/Release/net8.0/LlamaDashboard.sourcelink.json
