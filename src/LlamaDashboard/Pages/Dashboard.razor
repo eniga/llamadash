@@ -1,0 +1,165 @@
+@page "/dashboard"
+@inject ILlamaCppService LlamaService
+@inject ConfigService ConfigService
+@inject NavigationManager Navigation
+
+<div class="dashboard">
+    <div class="header">
+        <h1>@ConfigService.GetCurrentConfig().DashboardName</h1>
+        <div class="status-indicator @(isConnected ? "connected" : "disconnected")">
+            @(isConnected ? "✓ Connected" : "✗ Disconnected")
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-content">
+                <h3>Loaded Model</h3>
+                <p class="stat-value">@currentModel</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-content">
+                <h3>Token Rate</h3>
+                <p class="stat-value">@currentStats.TokensPerSecond.ToString("F2") t/s</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+                <h3>Tokens Processed</h3>
+                <p class="stat-value">@currentStats.TokensProcessed.ToString("N0")</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⏱️</div>
+            <div class="stat-content">
+                <h3>Uptime</h3>
+                <p class="stat-value">@FormatUptime(currentStats.Uptime)</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-buttons">
+            <button class="btn btn-primary" @onclick="NavigateToModels">Manage Models</button>
+            <button class="btn btn-secondary" @onclick="NavigateToDevices">View Devices</button>
+            <button class="btn btn-secondary" @onclick="NavigateToChat">Start Chat</button>
+            <button class="btn btn-secondary" @onclick="RefreshData">Refresh</button>
+        </div>
+    </div>
+
+    <div class="recent-activity">
+        <h2>Recent Activity</h2>
+        <div class="activity-list">
+            @foreach (var activity in recentActivities.Take(5))
+            {
+                <div class="activity-item">
+                    <span class="activity-time">@activity.Time.ToString("HH:mm:ss")</span>
+                    <span class="activity-message">@activity.Message</span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private Stats currentStats = new Stats();
+    private string currentModel = "None";
+    private bool isConnected = false;
+    private List<ActivityItem> recentActivities = new();
+
+    private Timer? refreshTimer;
+
+    protected override void OnInitialized()
+    {
+        ConfigService.ConfigChanged += (sender, config) => {
+            StateHasChanged();
+        };
+        
+        refreshTimer = new Timer(RefreshData, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(ConfigService.GetCurrentConfig().RefreshInterval));
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RefreshData();
+        }
+    }
+
+    private async Task RefreshData()
+    {
+        try
+        {
+            var stats = await LlamaService.GetStatsAsync();
+            var models = await LlamaService.GetModelsAsync();
+            var health = await LlamaService.HealthCheckAsync();
+
+            currentStats = stats;
+            currentModel = models.FirstOrDefault(m => m.IsLoaded)?.Name ?? "None";
+            isConnected = health;
+
+            if (isConnected)
+            {
+                AddActivity("Dashboard refreshed successfully");
+            }
+            else
+            {
+                AddActivity("Connection to llama.cpp server lost");
+            }
+        }
+        catch (Exception ex)
+        {
+            AddActivity($"Error: {ex.Message}");
+            isConnected = false;
+        }
+    }
+
+    private void AddActivity(string message)
+    {
+        recentActivities.Insert(0, new ActivityItem
+        {
+            Time = DateTime.UtcNow,
+            Message = message
+        });
+
+        if (recentActivities.Count > 10)
+        {
+            recentActivities.RemoveAt(recentActivities.Count - 1);
+        }
+    }
+
+    private string FormatUptime(double seconds)
+    {
+        if (seconds == 0) return "0 seconds";
+        
+        var uptime = TimeSpan.FromSeconds(seconds);
+        if (uptime.Days > 0)
+            return $"{uptime.Days}d {uptime.Hours}h {uptime.Minutes}m";
+        if (uptime.Hours > 0)
+            return $"{uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
+        return $"{uptime.Minutes}m {uptime.Seconds}s";
+    }
+
+    private void NavigateToModels() => Navigation.NavigateTo("/models");
+    private void NavigateToDevices() => Navigation.NavigateTo("/devices");
+    private void NavigateToChat() => Navigation.NavigateTo("/chat");
+
+    public void Dispose()
+    {
+        refreshTimer?.Dispose();
+    }
+
+    private class ActivityItem
+    {
+        public DateTime Time { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
+}

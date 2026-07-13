@@ -1,0 +1,104 @@
+@page "/chat"
+@inject ILlamaCppService LlamaService
+@inject ConfigService ConfigService
+
+<div class="chat-page">
+    <div class="chat-container">
+        <div class="chat-messages" @onwheel="HandleScroll">
+            @foreach (var message in messages)
+            {
+                <div class="message @(message.Role) @(message.IsUser ? "user-message" : "assistant-message")">
+                    <div class="message-role">@(message.IsUser ? "You" : "Assistant")</div>
+                    <div class="message-content">@message.Content</div>
+                </div>
+            }
+            
+            @if (isTyping)
+            {
+                <div class="message assistant-message typing">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="chat-input-area">
+            <textarea @bind="userMessage" 
+                      @bind:event="oninput"
+                      placeholder="Type your message..."
+                      rows="1"
+                      @onkeydown.enter="SendMessage"
+                      disabled="@isTyping"></textarea>
+            <button class="send-button" 
+                    @onclick="SendMessage" 
+                    disabled="@string.IsNullOrWhiteSpace(userMessage) || isTyping">
+                Send
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ChatMessage> messages = new();
+    private string userMessage = string.Empty;
+    private bool isTyping = false;
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(userMessage) || isTyping)
+            return;
+
+        var userMsg = new ChatMessage { Role = "user", Content = userMessage };
+        messages.Add(userMsg);
+        
+        var currentMessage = userMessage;
+        userMessage = string.Empty;
+        isTyping = true;
+        
+        try
+        {
+            var request = new ChatCompletionRequest
+            {
+                Model = "default",
+                Messages = messages.Select(m => new Message { Role = m.Role, Content = m.Content }).ToList(),
+                Temperature = 0.7,
+                MaxTokens = 2048
+            };
+
+            var response = await LlamaService.ChatCompletionAsync(request);
+            
+            if (response.Choices != null && response.Choices.Count > 0)
+            {
+                var assistantMsg = new ChatMessage 
+                { 
+                    Role = "assistant", 
+                    Content = response.Choices[0].Message.Content,
+                    IsUser = false 
+                };
+                messages.Add(assistantMsg);
+            }
+        }
+        catch (Exception ex)
+        {
+            var errorMsg = new ChatMessage 
+            { 
+                Role = "assistant", 
+                Content = $"Error: {ex.Message}",
+                IsUser = false 
+            };
+            messages.Add(errorMsg);
+        }
+        finally
+        {
+            isTyping = false;
+        }
+    }
+
+    private void HandleScroll(MouseEventArgs e)
+    {
+        // Auto-scroll to bottom when new messages arrive
+    }
+}

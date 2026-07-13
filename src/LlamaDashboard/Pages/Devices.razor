@@ -1,0 +1,81 @@
+@page "/devices"
+@inject ILlamaCppService LlamaService
+@inject ConfigService ConfigService
+
+<div class="devices-page">
+    <div class="page-header">
+        <h1>GPU Devices</h1>
+        <button class="btn btn-secondary" @onclick="RefreshDevices">Refresh</button>
+    </div>
+
+    @if (devices == null || devices.Count == 0)
+    {
+        <div class="empty-state">
+            <p>No GPU devices detected</p>
+        </div>
+    }
+    else
+    {
+        <div class="devices-grid">
+            @foreach (var device in devices)
+            {
+                <div class="device-card">
+                    <div class="device-header">
+                        <h3>@device.Name</h3>
+                        <span class="device-type">@device.Type</span>
+                    </div>
+                    
+                    <div class="device-info">
+                        <div class="info-row">
+                            <span class="label">Memory:</span>
+                            <span class="value">@FormatMemory(device.UsedMemory) / @FormatMemory(device.TotalMemory)</span>
+                        </div>
+                        
+                        <div class="memory-bar-container">
+                            <div class="memory-bar" style="width: @GetMemoryPercentage(device)%;"></div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <span class="label">Utilization:</span>
+                            <span class="value">@device.Utilization%</span>
+                        </div>
+                        
+                        @if (!string.IsNullOrEmpty(device.CudaVersion))
+                        {
+                            <div class="info-row">
+                                <span class="label">CUDA Version:</span>
+                                <span class="value">@device.CudaVersion</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Device> devices = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshDevices();
+    }
+
+    private async Task RefreshDevices()
+    {
+        devices = await LlamaService.GetDevicesAsync();
+    }
+
+    private string FormatMemory(long bytes)
+    {
+        var gb = bytes / (1024.0 * 1024.0 * 1024.0);
+        return $"{gb:F2} GB";
+    }
+
+    private double GetMemoryPercentage(Device device)
+    {
+        if (device.TotalMemory == 0) return 0;
+        return (device.UsedMemory / (double)device.TotalMemory) * 100;
+    }
+}

@@ -1,0 +1,110 @@
+@page "/settings"
+@inject ConfigService ConfigService
+
+<div class="settings-page">
+    <div class="page-header">
+        <h1>Settings</h1>
+        <button class="btn btn-primary" @onclick="SaveSettings">Save Changes</button>
+    </div>
+
+    <div class="settings-container">
+        <div class="settings-section">
+            <h2>Llama.cpp Server</h2>
+            
+            <div class="form-group">
+                <label for="serverUrl">Server URL</label>
+                <input type="text" 
+                       id="serverUrl" 
+                       @bind="config.ServerUrl" 
+                       placeholder="http://localhost:8080/v1" />
+                <small>The URL of your llama.cpp server API endpoint</small>
+            </div>
+
+            <div class="form-group">
+                <label for="apiKey">API Key (optional)</label>
+                <input type="password" 
+                       id="apiKey" 
+                       @bind="config.ApiKey" 
+                       placeholder="Your API key if required" />
+                <small>Set this if your server requires authentication</small>
+            </div>
+
+            <div class="form-group">
+                <label for="refreshInterval">Refresh Interval (ms)</label>
+                <input type="number" 
+                       id="refreshInterval" 
+                       @bind="config.RefreshInterval" 
+                       min="1000"
+                       max="60000" />
+                <small>How often to refresh dashboard data (1000-60000ms)</small>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Dashboard</h2>
+            
+            <div class="form-group">
+                <label for="dashboardName">Dashboard Name</label>
+                <input type="text" 
+                       id="dashboardName" 
+                       @bind="config.DashboardName" 
+                       placeholder="Llama Dashboard" />
+                <small>Name displayed in the dashboard header</small>
+            </div>
+
+            <div class="form-group">
+                <label for="theme">Theme</label>
+                <select id="theme" @bind="config.Theme">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                </select>
+                <small>UI theme preference</small>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h2>Connection Status</h2>
+            <div class="connection-status @(isConnected ? "connected" : "disconnected")">
+                @(isConnected ? "✓ Connected to server" : "✗ Not connected")
+            </div>
+            <button class="btn btn-secondary" @onclick="TestConnection">Test Connection</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Config config = new();
+    private bool isConnected = false;
+
+    protected override void OnInitialized()
+    {
+        config = ConfigService.GetCurrentConfig();
+    }
+
+    private async Task SaveSettings()
+    {
+        ConfigService.UpdateConfig(config);
+        isConnected = false;
+        await TestConnection();
+    }
+
+    private async Task TestConnection()
+    {
+        try
+        {
+            var service = new LlamaCppService(new HttpClient(), null!, new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>
+                {
+                    { "LlamaCpp:Url", config.ServerUrl },
+                    { "LlamaCpp:ApiKey", config.ApiKey }
+                })
+                .Build());
+            
+            isConnected = await service.HealthCheckAsync();
+        }
+        catch
+        {
+            isConnected = false;
+        }
+    }
+}

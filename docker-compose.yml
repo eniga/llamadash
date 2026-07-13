@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  llama-dashboard:
+    build:
+      context: ./src/LlamaDashboard
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8080"
+    environment:
+      - LlamaCpp__Url=https://ai.aradhel.dev/v1
+      - LlamaCpp__ApiKey=${LlamaCpp_ApiKey:-}
+      - Dashboard__RefreshInterval=3000
+      - Dashboard__Theme=dark
+    networks:
+      - default
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+networks:
+  default:
+    driver: bridge

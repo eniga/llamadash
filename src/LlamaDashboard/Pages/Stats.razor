@@ -1,0 +1,130 @@
+@page "/stats"
+@inject ILlamaCppService LlamaService
+@inject ConfigService ConfigService
+
+<div class="stats-page">
+    <div class="page-header">
+        <h1>Statistics</h1>
+        <button class="btn btn-secondary" @onclick="RefreshStats">Refresh</button>
+    </div>
+
+    @if (stats == null)
+    {
+        <div class="loading">Loading statistics...</div>
+    }
+    else
+    {
+        <div class="stats-overview">
+            <div class="stats-section">
+                <h2>Token Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Tokens Processed</div>
+                        <div class="stat-value">@stats.TokensProcessed.ToString("N0")</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">Tokens per Second</div>
+                        <div class="stat-value">@stats.TokensPerSecond.ToString("F2")</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">Prompt Tokens</div>
+                        <div class="stat-value">@stats.PromptTokens.ToString("N0")</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">Completion Tokens</div>
+                        <div class="stat-value">@stats.CompletionTokens.ToString("N0")</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h2>Performance Metrics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Uptime</div>
+                        <div class="stat-value">@FormatUptime(stats.Uptime)</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">Last Request</div>
+                        <div class="stat-value">@stats.LastRequest.ToString("yyyy-MM-dd HH:mm:ss")</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">Total Requests</div>
+                        <div class="stat-value">@stats.TotalRequests.ToString("N0")</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-label">KV Cache Size</div>
+                        <div class="stat-value">@FormatSize(stats.KvCacheSize)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-section">
+                <h2>Server Information</h2>
+                <div class="server-info">
+                    <div class="info-row">
+                        <span class="label">Server URL:</span>
+                        <span class="value">@ConfigService.GetCurrentConfig().ServerUrl</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Refresh Interval:</span>
+                        <span class="value">@ConfigService.GetCurrentConfig().RefreshInterval ms</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Theme:</span>
+                        <span class="value">@ConfigService.GetCurrentConfig().Theme</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private Stats? stats;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshStats();
+    }
+
+    private async Task RefreshStats()
+    {
+        stats = await LlamaService.GetStatsAsync();
+    }
+
+    private string FormatUptime(double seconds)
+    {
+        if (seconds == 0) return "0 seconds";
+        
+        var uptime = TimeSpan.FromSeconds(seconds);
+        if (uptime.Days > 0)
+            return $"{uptime.Days}d {uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
+        if (uptime.Hours > 0)
+            return $"{uptime.Hours}h {uptime.Minutes}m {uptime.Seconds}s";
+        if (uptime.Minutes > 0)
+            return $"{uptime.Minutes}m {uptime.Seconds}s";
+        return $"{uptime.Seconds}s";
+    }
+
+    private string FormatSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        double size = bytes;
+        int unitIndex = 0;
+        
+        while (size >= 1024 && unitIndex < sizes.Length - 1)
+        {
+            size /= 1024;
+            unitIndex++;
+        }
+        
+        return $"{size:F2} {sizes[unitIndex]}";
+    }
+}

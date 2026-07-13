@@ -1,0 +1,21 @@
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-bar">
+            <h1>@PageTitle</h1>
+        </div>
+        <div class="main-content">
+            @Body
+        </div>
+    </main>
+</div>
+
+@code {
+    private string PageTitle => Navigation.ToAbsoluteUri(Navigation.Uri).AbsolutePath.Split('/').LastOrDefault() ?? "Dashboard";
+}

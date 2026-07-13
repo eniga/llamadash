@@ -1,0 +1,131 @@
+@page "/models"
+@inject ILlamaCppService LlamaService
+@inject ConfigService ConfigService
+
+<div class="models-page">
+    <div class="page-header">
+        <h1>Models</h1>
+        <button class="btn btn-secondary" @onclick="RefreshModels">Refresh</button>
+    </div>
+
+    @if (models == null)
+    {
+        <div class="loading">Loading models...</div>
+    }
+    else if (models.Count == 0)
+    {
+        <div class="empty-state">
+            <p>No models available</p>
+        </div>
+    }
+    else
+    {
+        <div class="models-grid">
+            @foreach (var model in models)
+            {
+                <div class="model-card @(model.IsLoaded ? "loaded" : "")">
+                    <div class="model-header">
+                        <h3>@model.Name</h3>
+                        @if (model.IsLoaded)
+                        {
+                            <span class="status-badge loaded">Loaded</span>
+                        }
+                        else
+                        {
+                            <span class="status-badge unloaded">Not Loaded</span>
+                        }
+                    </div>
+                    
+                    <div class="model-info">
+                        <div class="info-row">
+                            <span class="label">ID:</span>
+                            <span class="value">@model.Id</span>
+                        </div>
+                        
+                        @if (model.SizeBytes > 0)
+                        {
+                            <div class="info-row">
+                                <span class="label">Size:</span>
+                                <span class="value">@FormatSize(model.SizeBytes)</span>
+                            </div>
+                        }
+                        
+                        @if (model.ContextSize > 0)
+                        {
+                            <div class="info-row">
+                                <span class="label">Context:</span>
+                                <span class="value">@model.ContextSize</span>
+                            </div>
+                        }
+                        
+                        @if (model.Layers > 0)
+                        {
+                            <div class="info-row">
+                                <span class="label">Layers:</span>
+                                <span class="value">@model.Layers</span>
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="model-actions">
+                        @if (model.IsLoaded)
+                        {
+                            <button class="btn btn-danger" @onclick="() => UnloadModel(model.Id)">Unload</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary" @onclick="() => LoadModel(model.Id)">Load</button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<ModelInfo>? models;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshModels();
+    }
+
+    private async Task RefreshModels()
+    {
+        models = await LlamaService.GetModelsAsync();
+    }
+
+    private async Task LoadModel(string modelId)
+    {
+        var success = await LlamaService.LoadModelAsync(modelId);
+        if (success)
+        {
+            await RefreshModels();
+        }
+    }
+
+    private async Task UnloadModel(string modelId)
+    {
+        var success = await LlamaService.UnloadModelAsync(modelId);
+        if (success)
+        {
+            await RefreshModels();
+        }
+    }
+
+    private string FormatSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        double size = bytes;
+        int unitIndex = 0;
+        
+        while (size >= 1024 && unitIndex < sizes.Length - 1)
+        {
+            size /= 1024;
+            unitIndex++;
+        }
+        
+        return $"{size:F2} {sizes[unitIndex]}";
+    }
+}

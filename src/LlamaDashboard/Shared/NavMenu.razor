@@ -1,0 +1,74 @@
+<div class="nav-menu">
+    <div class="nav-header">Llama Dashboard</div>
+    
+    <nav class="nav-links">
+        <a href="/dashboard" class="nav-link">
+            <span class="icon">📊</span>
+            Dashboard
+        </a>
+        <a href="/devices" class="nav-link">
+            <span class="icon">🖥️</span>
+            Devices
+        </a>
+        <a href="/models" class="nav-link">
+            <span class="icon">📦</span>
+            Models
+        </a>
+        <a href="/stats" class="nav-link">
+            <span class="icon">📈</span>
+            Statistics
+        </a>
+        <a href="/chat" class="nav-link">
+            <span class="icon">💬</span>
+            Chat
+        </a>
+        <a href="/settings" class="nav-link">
+            <span class="icon">⚙️</span>
+            Settings
+        </a>
+    </nav>
+</div>
+
+<style>
+    .nav-menu {
+        background: #1a1a2e;
+        color: #eee;
+        padding: 20px;
+        min-width: 250px;
+    }
+
+    .nav-header {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #00d4ff;
+        text-align: center;
+    }
+
+    .nav-links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 15px;
+        color: #ccc;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+        background: #16213e;
+        color: #00d4ff;
+    }
+
+    .nav-link .icon {
+        font-size: 1.2rem;
+    }
+</style>
