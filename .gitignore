@@ -1,0 +1,78 @@
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio 2015/2017 cache/options directory
+.vs/
+
+## Visual Studio Code
+.vscode/
+
+## JetBrains Rider
+.idea/
+*.sln.iml
+
+## NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Files restored by Microsoft.Web.LibraryManager.Build
+lib/managers/
+
+## Build results of DAX Files
+[Dd]ata/
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Bower
+bower_components/
+
+## Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+## Mac OS
+.DS_Store
+
+## Temporary files
+*.tmp
+*.temp
+*.cache
+
+## Docker
+.docker/
+
+## Environment variables
+.env
+.env.local
+.env.*.local
